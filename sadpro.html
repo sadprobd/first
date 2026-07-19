@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>sadpro · feelings, professionally managed</title>
+
+  <!-- Modern Fonts: Switzer for body, Boska for headings, plus mono -->
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700&f[]=boska@500,700,900&f[]=jet-brains-mono@400,500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* ULTRA MODERN COLOR PALETTE — deep aubergine, electric lavender, mint, coral */
+      --bg-deep: #0B0A1A;
+      --surface-soft: #1A1530;
+      --lavender: #C2B0FF;
+      --electric-lav: #A78BFA;
+      --mint: #2DD4BF;
+      --coral: #FF7B6B;
+      --coral-glow: #FF8A7A;
+      --text-primary: #F4F0FF;
+      --text-secondary: #B9B0D0;
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-bg: rgba(20, 15, 35, 0.55);
+      --glass-bg-hover: rgba(30, 22, 50, 0.7);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-full: 999px;
+      --shadow-glow: 0 12px 40px rgba(162, 138, 255, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Switzer', system-ui, -apple-system, sans-serif;
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.5;
+      overflow-x: hidden;
+      transition: background 0.4s ease;
+    }
+
+    /* DYNAMIC BACKGROUND CANVAS */
+    #dynamic-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(45, 212, 191, 0.04) 0%, rgba(11, 10, 26, 0.85) 85%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* TYPOGRAPHY */
+    h1, h2, h3 {
+      font-family: 'Boska', 'Times New Roman', serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--mint);
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+
+    /* GLASS CARDS */
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .glass-card {
+      background: rgba(20, 15, 35, 0.45);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-lg);
+      transition: transform 0.3s ease, background 0.3s, border-color 0.2s;
+    }
+
+    .glass-card:hover {
+      background: var(--glass-bg-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-6px);
+    }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-primary);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #FF7B6B, #FF8A7A);
+      border: none;
+      color: #0B0A1A;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(255, 123, 107, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 18px 35px rgba(255, 123, 107, 0.55);
+    }
+
+    .btn-secondary {
+      background: rgba(194, 176, 255, 0.1);
+      border: 1px solid rgba(194, 176, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(194, 176, 255, 0.2);
+      border-color: var(--lavender);
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    section {
+      position: relative;
+      z-index: 2;
+      padding: 6rem 0;
+    }
+
+    /* NAVIGATION */
+    .navbar {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 1100px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(11, 10, 26, 0.7);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 60px;
+    }
+
+    .logo {
+      font-family: 'Boska', serif;
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .logo-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--coral);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--coral);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      font-weight: 500;
+      transition: 0.2s;
+      text-decoration: none;
+    }
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      padding-top: 5rem;
+    }
+    .hero h1 {
+      font-size: clamp(3.2rem, 7vw, 5.5rem);
+      max-width: 14ch;
+      margin: 1.5rem auto;
+      background: linear-gradient(to right, #F4F0FF, #C2B0FF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 2.2rem;
+    }
+
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .stat-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.4rem;
+    }
+
+    /* FEATURES */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* TESTIMONIAL */
+    .testimonial-card {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 3rem;
+      text-align: center;
+    }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 2.5rem 0;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .mockup-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        padding: 0.9rem 1.4rem;
+      }
+      section {
+        padding: 4rem 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="dynamic-bg"></canvas>
+  <div class="bg-overlay"></div>
+
+  <!-- NAVIGATION -->
+  <header class="navbar">
+    <div class="logo">
+      <span class="logo-dot"></span> sadpro
+    </div>
+    <div class="nav-links">
+      <a href="#">Product</a>
+      <a href="#">Dashboard</a>
+      <a href="#">Customers</a>
+      <a href="#" class="btn btn-secondary" style="padding:0.5rem 1.4rem;">Log in</a>
+      <a href="#" class="btn btn-primary" style="padding:0.6rem 1.6rem;">Get started</a>
+    </div>
+    <button class="mobile-menu-btn">☰</button>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero container">
+      <span class="eyebrow">● status: operational despair</span>
+      <h1>Turn your feelings into deliverables.</h1>
+      <p>Enterprise-grade emotional management. Track sentiment, forecast burnout, and finally put a metric on your mood.</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="#" class="btn btn-primary">Start feeling productive</a>
+        <a href="#" class="btn btn-secondary">Live demo ↗</a>
+      </div>
+
+      <!-- Dashboard mockup -->
+      <div class="mockup-grid">
+        <div class="glass-card stat-badge">
+          <span style="font-weight:600;">Weekly mood throughput</span>
+          <div style="display:flex; gap:5px; align-items:flex-end; height:40px;">
+            <span style="width:10px; height:70%; background:var(--coral); border-radius:4px;"></span>
+            <span style="width:10px; height:40%; background:var(--lavender); border-radius:4px;"></span>
+            <span style="width:10px; height:90%; background:var(--mint); border-radius:4px;"></span>
+            <span style="width:10px; height:55%; background:var(--coral); border-radius:4px;"></span>
+          </div>
+        </div>
+        <div class="glass-card stat-badge">
+          <div>
+            <span style="color:var(--text-secondary); font-size:0.8rem;">This sprint</span>
+            <div style="font-size:2rem; font-weight:700;">4.2</div>
+            <span style="color:var(--mint);">avg spiral (min)</span>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700;">92%</div>
+            <span style="color:var(--text-secondary);">crying on schedule</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES SECTION (new page feel) -->
+    <section id="features" class="container">
+      <div style="text-align:center; margin-bottom:3rem;">
+        <span class="eyebrow">the platform</span>
+        <h2 style="font-size:clamp(2.4rem,5vw,3.5rem);">Feel bad, at scale.</h2>
+      </div>
+      <div class="features-grid">
+        <div class="glass-card" style="padding:2.2rem;">
+          <div class="feature-icon">📊</div>
+          <h3 style="margin-bottom:0.8rem;">Mood dashboards</h3>
+          <p style="color:var(--text-secondary);">Real-time charts cross-referenced with your calendar. Know exactly which meeting caused the dip.</p>
+        </div>
+        <div class="glass-card" style="padding:2.2rem;">
+          <div class="feature-icon">🧘</div>
+          <h3 style="margin-bottom:0.8rem;">Async cry standups</h3>
+          <p style="color:var(--text-secondary);">Post emotional blockers in a thread. No cameras, just emoji reacts.</p>
+        </div>
+        <div class="glass-card" style="padding:2.2rem;">
+          <div class="feature-icon">🔮</div>
+          <h3 style="margin-bottom:0.8rem;">Burnout forecasting</h3>
+          <p style="color:var(--text-secondary);">AI predicts your next spiral 3 business days out. Reschedule politely.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIAL (separate section) -->
+    <section class="container" style="padding-top:2rem;">
+      <div class="glass-panel testimonial-card">
+        <span style="font-size:3rem; color:var(--lavender);">“</span>
+        <p style="font-size:1.5rem; font-style:italic; font-family:'Boska',serif;">We rolled out sadpro org-wide and our quarterly despair became fully auditable. Leadership finally trusts the numbers.</p>
+        <div style="margin-top:2rem; color:var(--mint);">— Head of People, a startup that's fine</div>
+      </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="container" style="text-align:center;">
+      <div class="glass-panel" style="padding:4rem 2rem;">
+        <span class="eyebrow">onboarding in 4 minutes</span>
+        <h2 style="font-size:2.8rem; margin-bottom:1rem;">Your feelings want a dashboard.</h2>
+        <p style="color:var(--text-secondary); margin-bottom:2rem;">Stop bottling it up. Start exporting to CSV.</p>
+        <div style="display:flex; gap:1rem; justify-content:center;">
+          <a href="#" class="btn btn-primary">Start feeling productively</a>
+          <a href="#" class="btn btn-secondary">Talk to sales</a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="container footer">
+      <div class="logo" style="font-size:1.4rem;"><span class="logo-dot"></span> sadpro</div>
+      <div style="display:flex; gap:2rem; color:var(--text-secondary);">
+        <a href="#" style="color:inherit; text-decoration:none;">Product</a>
+        <a href="#" style="color:inherit; text-decoration:none;">Dashboard</a>
+        <a href="#" style="color:inherit; text-decoration:none;">Customers</a>
+      </div>
+      <span style="color:var(--text-secondary); font-size:0.8rem;">© 2026 sadpro. feelings not FDIC insured.</span>
+    </footer>
+  </main>
+
+  <script>
+    (function() {
+      // ----- DYNAMIC BACKGROUND that changes on scroll -----
+      const canvas = document.getElementById('dynamic-bg');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // Color stops that shift based on scroll
+      function getScrollPercent() {
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight || 1;
+        return Math.min(scrollY / maxScroll, 1.0);
+      }
+
+      function drawBackground() {
+        const scroll = getScrollPercent();
+        
+        // Interpolate between deep purple -> teal/mint -> coral based on scroll
+        const r1 = 25 + scroll * 30;
+        const g1 = 15 + scroll * 25;
+        const b1 = 45 + scroll * 15;
+        
+        const r2 = 45 + scroll * 40;
+        const g2 = 180 - scroll * 40;
+        const b2 = 160 - scroll * 30;
+
+        const gradient = ctx.createLinearGradient(0, 0, width * 0.8, height);
+        gradient.addColorStop(0, `rgb(${r1}, ${g1}, ${b1})`);
+        gradient.addColorStop(0.6, `rgb(${r2}, ${g2}, ${b2})`);
+        gradient.addColorStop(1, `rgb(255, ${120 + scroll*30}, ${100 + scroll*20})`);
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        // Animated floating orbs that also shift color
+        const time = Date.now() * 0.001;
+        for (let i = 0; i < 4; i++) {
+          const x = (Math.sin(time * 0.3 + i) * 0.5 + 0.5) * width;
+          const y = (Math.cos(time * 0.2 + i * 2) * 0.5 + 0.5) * height;
+          const radius = 120 + Math.sin(time + i) * 30;
+          
+          const orbGrad = ctx.createRadialGradient(x, y, 0, x, y, radius);
+          if (i % 2 === 0) {
+            orbGrad.addColorStop(0, `rgba(255, 123, 107, ${0.12 + scroll * 0.08})`);
+            orbGrad.addColorStop(1, 'rgba(255, 123, 107, 0)');
+          } else {
+            orbGrad.addColorStop(0, `rgba(45, 212, 191, ${0.1 + scroll * 0.06})`);
+            orbGrad.addColorStop(1, 'rgba(45, 212, 191, 0)');
+          }
+          ctx.fillStyle = orbGrad;
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        requestAnimationFrame(drawBackground);
+      }
+      drawBackground();
+
+      // Simple mobile menu toggle (visual only)
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      if (menuBtn) {
+        menuBtn.addEventListener('click', () => {
+          alert('Mobile menu demo: links work as anchors.');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
